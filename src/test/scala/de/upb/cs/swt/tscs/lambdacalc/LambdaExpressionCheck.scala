@@ -44,4 +44,29 @@ class LambdaExpressionCheck extends FlatSpec with Matchers {
           LambdaVariable("x"))
   }
 
+  "(λx.λy.((x y) x) c)" should "be valid" in {
+    var parserResult = new LambdaCalculusSyntax("(λx.λy.((x y) x) c)").Term.run()
+    parserResult shouldBe a [Success[_]]
+    parserResult.get shouldBe new LambdaApplication(
+      LambdaAbstraction("x",
+        LambdaAbstraction("y",
+          LambdaApplication(
+            LambdaApplication(
+              LambdaVariable("x"),
+              LambdaVariable("y")),
+            LambdaVariable("x")))),
+      LambdaVariable("c"))
+  }
+
+  it should "evaluate to a substituted form" in {
+    var parserResult = new LambdaCalculusSyntax("(λx.λy.((x y) x) c)").Term.run()
+
+    parserResult.get.-->*() shouldBe new LambdaAbstraction("y",
+          LambdaApplication(
+            LambdaApplication(
+              LambdaVariable("c"),
+              LambdaVariable("y")),
+            LambdaVariable("c")))
+  }
+
 }
