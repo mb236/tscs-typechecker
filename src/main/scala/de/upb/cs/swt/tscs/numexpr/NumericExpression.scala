@@ -1,11 +1,11 @@
 package de.upb.cs.swt.tscs.numexpr
 
-import de.upb.cs.swt.tscs.{Expression, ExpressionWithEvaluation}
+import de.upb.cs.swt.tscs.{Expression, Evaluation}
 
 /**
   * Specifies the operation semantics of the N language
   */
-trait NumericExpression extends ExpressionWithEvaluation {
+trait NumericExpression extends Evaluation {
   override def -->(): Expression = -->(this)
 
   override def -->(expr: Expression): Expression = {

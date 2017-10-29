@@ -3,7 +3,7 @@ package de.upb.cs.swt.tscs
 /**
   * Extends expressions with a framework for small-step semantics style evaluation
   */
-trait ExpressionWithEvaluation extends Expression{
+trait Evaluation extends Expression{
 
   def -->(): Expression
 

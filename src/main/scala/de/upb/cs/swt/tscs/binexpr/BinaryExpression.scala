@@ -1,11 +1,11 @@
 package de.upb.cs.swt.tscs.binexpr
 
-import de.upb.cs.swt.tscs.{Expression, ExpressionWithEvaluation}
+import de.upb.cs.swt.tscs.{Expression, Evaluation}
 
 /**
   * Specifies the operational semantics of the B language
   */
-trait BinaryExpression extends ExpressionWithEvaluation {
+trait BinaryExpression extends Evaluation {
   override def -->(): Expression = -->(this)
 
   override def -->(expr: Expression): Expression =
