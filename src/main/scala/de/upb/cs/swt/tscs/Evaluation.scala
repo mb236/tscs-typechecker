@@ -14,6 +14,8 @@ trait Evaluation extends Expression{
     (nextProgression != null)
   }
 
+  def isValue(expr: Expression) : Boolean = expr.isInstanceOf[Value]
+
    def -->*(): Expression = {
     var expr = -->(this)
 

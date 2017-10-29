@@ -49,10 +49,10 @@ class NumericExpressionSyntax(val input : ParserInput) extends Parser {
   }
 
   def PredTerm = rule {
-    "succ " ~ Term ~> PredExpr
+    "pred " ~ Term ~> PredExpr
   }
 
   def IsZeroTerm = rule {
-    "succ " ~ Term ~> IsZeroExpr
+    "iszero " ~ Term ~> IsZeroExpr
   }
 }
