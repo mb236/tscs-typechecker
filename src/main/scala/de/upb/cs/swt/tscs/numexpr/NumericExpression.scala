@@ -9,7 +9,6 @@ trait NumericExpression extends Evaluation {
   override def -->(): Expression = -->(this)
 
   override def -->(expr: Expression): Expression = {
-    //println("Evaluating: " + expr.toString)
     expr match {
       case ValueExpr(v) => ValueExpr(v)
       case SuccNvExpr(nv) => SuccNvExpr(nv)

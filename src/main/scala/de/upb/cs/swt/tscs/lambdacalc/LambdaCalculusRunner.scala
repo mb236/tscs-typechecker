@@ -9,7 +9,7 @@ import scala.util.{Failure, Success}
   */
 object LambdaCalculusRunner {
   def main(args: Array[String]): Unit = {
-    def input: ParserInput = "λx.λy.((x y) x)"
+    def input: ParserInput = "(λx.λy.((x y) x) c)"
 
     val environment = new LambdaCalculusSyntax(input)
     val result = environment.Term.run()
