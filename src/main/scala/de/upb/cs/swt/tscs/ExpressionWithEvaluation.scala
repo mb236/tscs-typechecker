@@ -14,7 +14,7 @@ trait ExpressionWithEvaluation extends Expression{
     (nextProgression != null)
   }
 
-  def -->*(): Expression = {
+   def -->*(): Expression = {
     var expr = -->(this)
 
     while (true) {

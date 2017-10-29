@@ -1,9 +1,11 @@
 package de.upb.cs.swt.tscs.numexpr
 
-import org.parboiled2.{Parser, ParserInput, Rule1}
+import org.parboiled2.{Parser, ParserInput, Rule0, Rule1}
+import shapeless.HList
 
 /**
-  * Created by benhermann on 28.10.17.
+  * Syntax for the N language
+  * @param input
   */
 class NumericExpressionSyntax(val input : ParserInput) extends Parser {
   def InputLine = rule {
@@ -18,7 +20,7 @@ class NumericExpressionSyntax(val input : ParserInput) extends Parser {
     TrueTerm | FalseTerm | NumericValueTerm
   }
 
-  def NumericValueTerm : Rule1[NumericValueExpr] = rule {
+  def NumericValueTerm = rule {
     run { ZeroTerm | SuccNvTerm }
   }
 
@@ -31,11 +33,11 @@ class NumericExpressionSyntax(val input : ParserInput) extends Parser {
   }
 
   def ZeroTerm = rule {
-    capture("0") ~> NumericValueExpr
+    capture("0") ~> ValueExpr
   }
 
-  def SuccNvTerm = rule {
-    "succ " ~ capture(NumericValueTerm) ~> NumericValueExpr
+  def SuccNvTerm : Rule1[SuccNvExpr] = rule {
+    "succ " ~ ZeroTerm ~> SuccNvExpr | "succ " ~ SuccNvTerm ~> SuccNvExpr
   }
 
   def IfTerm = rule {
