@@ -55,7 +55,7 @@ class BinaryExpressionCheck extends FlatSpec with Matchers {
   it should "evaluate in one step to if false then false else true" in {
     val parseResult = new BinaryExpressionSyntax("if if true then false else true then false else true").Term.run()
     parseResult shouldBe a [Success[_]]
-    assertResult (new IfExpr(new ValueExpr("false"), new ValueExpr("false"), new ValueExpr("true"))) { parseResult.get.--> }
+    assertResult (IfExpr(ValueExpr("false"), ValueExpr("false"), ValueExpr("true"))) { parseResult.get.--> }
   }
 
 

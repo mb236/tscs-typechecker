@@ -3,20 +3,20 @@ package de.upb.cs.swt.tscs
 /**
   * Extends expressions with a framework for small-step semantics style evaluation
   */
-trait Evaluation extends Expression{
+trait Evaluation extends Expression {
 
   def -->(): Expression
 
   def -->(expr: Expression): Expression
 
-  def progressPossible(expr: Expression) : Boolean = {
+  def progressPossible(expr: Expression): Boolean = {
     val nextProgression = -->(expr)
-    (nextProgression != null)
+    nextProgression != null
   }
 
-  def isValue(expr: Expression) : Boolean = expr.isInstanceOf[Value]
+  def isValue(expr: Expression): Boolean = expr.isInstanceOf[Value]
 
-   def -->*(): Expression = {
+  def -->*(): Expression = {
     var expr = -->(this)
 
     while (true) {
@@ -27,6 +27,6 @@ trait Evaluation extends Expression{
       }
       expr = -->(expr)
     }
-    return null
+    null
   }
 }
