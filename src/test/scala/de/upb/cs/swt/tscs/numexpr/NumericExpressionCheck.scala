@@ -98,4 +98,15 @@ class NumericExpressionCheck extends FlatSpec with Matchers {
     parseResult.get.-->*() shouldBe null
   }
 
+  "Term succ pred 0" should "be valid" in {
+    val parseResult = new NumericExpressionSyntax("succ pred 0").Term.run()
+    parseResult shouldBe a [Success[_]]
+  }
+
+  it should "evaluate to succ 0" in {
+    val parseResult = new NumericExpressionSyntax("succ pred 0").Term.run()
+    parseResult shouldBe a [Success[_]]
+    parseResult.get.-->*().toString() shouldBe "succ 0"
+  }
+
 }

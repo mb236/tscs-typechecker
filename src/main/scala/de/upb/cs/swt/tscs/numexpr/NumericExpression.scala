@@ -13,6 +13,7 @@ trait NumericExpression extends Evaluation {
     expr match {
       case ValueExpr(v) => ValueExpr(v)
       case SuccNvExpr(nv) => SuccNvExpr(nv)
+      case SuccExpr(subExpr) if isValue(subExpr) => SuccNvExpr(subExpr)
       /* E-IfTrue      */ case IfExpr(ValueExpr("true"), iftrue, iffalse) => -->(iftrue)
       /* E-IfFalse     */ case IfExpr(ValueExpr("false"), iftrue, iffalse) => -->(iffalse)
       /* E-If          */ case IfExpr(cond, iftrue, iffalse) => IfExpr(-->(cond), iftrue, iffalse)
