@@ -24,35 +24,35 @@ class NumericExpressionSyntax(val input : ParserInput) extends Parser {
   }
 
   def TrueTerm = rule {
-    capture("true") ~> ValueExpr
+    capture("true") ~ optional(" : " ~ TypeInfo) ~> ValueExpr
   }
 
   def FalseTerm = rule {
-    capture("false") ~> ValueExpr
+    capture("false") ~ optional(" : " ~ TypeInfo) ~> ValueExpr
   }
 
   def ZeroTerm = rule {
-    capture("0") ~> ValueExpr
+    capture("0") ~ optional(" : " ~ TypeInfo) ~> ValueExpr
   }
 
   def SuccNvTerm : Rule1[SuccNvExpr] = rule {
-    "succ " ~ ZeroTerm ~> SuccNvExpr | "succ " ~ SuccNvTerm ~> SuccNvExpr
+    "succ " ~ ZeroTerm  ~ optional(" : " ~ TypeInfo) ~> SuccNvExpr | "succ " ~ SuccNvTerm  ~ optional(" : " ~ TypeInfo) ~> SuccNvExpr
   }
 
   def IfTerm = rule {
-    "if " ~ Term ~ " then " ~ Term ~ " else " ~ Term ~> IfExpr
+    "if " ~ Term ~ " then " ~ Term ~ " else " ~ Term  ~ optional(" : " ~ TypeInfo) ~> IfExpr
   }
 
   def SuccTerm = rule {
-    "succ " ~ Term ~> SuccExpr
+    "succ " ~ Term  ~ optional(" : " ~ TypeInfo) ~> SuccExpr
   }
 
   def PredTerm = rule {
-    "pred " ~ Term ~> PredExpr
+    "pred " ~ Term  ~ optional(" : " ~ TypeInfo) ~> PredExpr
   }
 
   def IsZeroTerm = rule {
-    "iszero " ~ Term ~> IsZeroExpr
+    "iszero " ~ Term  ~ optional(" : " ~ TypeInfo) ~> IsZeroExpr
   }
 
   def TypeInfo = rule {

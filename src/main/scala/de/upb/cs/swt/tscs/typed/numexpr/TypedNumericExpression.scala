@@ -18,49 +18,54 @@ trait TypedNumericExpression extends NumericExpression with Typecheck {
     expr match {
       /* T-True */
       case e: ValueExpr
-        if e.v == "true"
-          => storeAndWrap(e, TypeInformation("Bool"))
+        if e.v == "true" && e.typeAnnotation.getOrElse(TypeInformations.Bool) == TypeInformations.Bool
+          => storeAndWrap(e, TypeInformations.Bool)
 
       /* T-False */
       case e: ValueExpr
-        if e.v == "false"
-          => storeAndWrap(e, TypeInformation("Bool"))
+        if e.v == "false" && e.typeAnnotation.getOrElse(TypeInformations.Bool) == TypeInformations.Bool
+          => storeAndWrap(e, TypeInformations.Bool)
 
       /* T-Zero */
       case e: ValueExpr
-        if e.v == "0"
-          => storeAndWrap(e, TypeInformation("Nat"))
+        if e.v == "0" && e.typeAnnotation.getOrElse(TypeInformations.Nat) == TypeInformations.Nat
+          => storeAndWrap(e, TypeInformations.Nat)
 
       /* T-Succ1 */
       case e: SuccNvExpr
         if typecheck(e.nv).isSuccess &&
-           Gamma.get(e.nv).get == TypeInformation("Nat")
+          e.typeAnnotation.getOrElse(TypeInformations.Nat) == TypeInformations.Nat &&
+           Gamma.get(e.nv).get == TypeInformations.Nat
                 => storeAndWrap(e, Gamma.get(e.nv).get)
 
       /* T-Succ2 */
       case e: SuccExpr
         if typecheck(e.subterm).isSuccess &&
-          Gamma.get(e.subterm).get == TypeInformation("Nat")
+          e.typeAnnotation.getOrElse(TypeInformations.Nat) == TypeInformations.Nat &&
+          Gamma.get(e.subterm).get == TypeInformations.Nat
                 => storeAndWrap(e, Gamma.get(e.subterm).get)
 
       /* T-Pred */
       case e: PredExpr
         if typecheck(e.subterm).isSuccess &&
-          Gamma.get(e.subterm).get == TypeInformation("Nat")
+          e.typeAnnotation.getOrElse(TypeInformations.Nat) == TypeInformations.Nat &&
+          Gamma.get(e.subterm).get == TypeInformations.Nat
             => storeAndWrap(e, Gamma.get(e.subterm).get)
 
       /* T-IsZero */
       case e: IsZeroExpr
         if typecheck(e.subterm).isSuccess &&
-            Gamma.get(e.subterm).get == TypeInformation("Nat")
+          e.typeAnnotation.getOrElse(TypeInformations.Nat) == TypeInformations.Nat &&
+            Gamma.get(e.subterm).get == TypeInformations.Nat
               => storeAndWrap(e, TypeInformations.Bool)
 
       /* T-If */
       case e: IfExpr
         if typecheck(e.condition).isSuccess &&
-          Gamma.get(e.condition).get == TypeInformation("Bool") &&
+          Gamma.get(e.condition).get == TypeInformations.Bool &&
           typecheck(e.IfTrue).isSuccess &&
-            (Gamma.getOrElse(e.IfTrue, typecheck(e.IfTrue).get) == Gamma.getOrElse(e.IfFalse, typecheck(e.IfFalse).get))
+            (Gamma.getOrElse(e.IfTrue, typecheck(e.IfTrue).get) == Gamma.getOrElse(e.IfFalse, typecheck(e.IfFalse).get)) &&
+            (e.typeAnnotation.getOrElse(typecheck(e.IfTrue).get) == typecheck(e.IfTrue).get)
               => storeAndWrap(e, Gamma.get(e.IfTrue).get)
 
       case _ => new Failure[TypeInformation](null)

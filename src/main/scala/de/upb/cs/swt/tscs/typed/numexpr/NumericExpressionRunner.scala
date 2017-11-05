@@ -10,7 +10,7 @@ import scala.util.{Failure, Success}
 object NumericExpressionRunner {
 
   def main(args: Array[String]): Unit = {
-    def input: ParserInput = "if true then false else 0"
+    def input: ParserInput = "if true then false else 0 : Bool"
 
     val environment = new NumericExpressionSyntax(input)
     val result = environment.Term.run()
