@@ -53,7 +53,7 @@ trait TypedNumericExpression extends NumericExpression with Typecheck {
       case e: IsZeroExpr
         if typecheck(e.subterm).isSuccess &&
             Gamma.get(e.subterm).get == TypeInformation("Nat")
-              => storeAndWrap(e, Gamma.get(e.subterm).get)
+              => storeAndWrap(e, TypeInformations.Bool)
 
       /* T-If */
       case e: IfExpr
