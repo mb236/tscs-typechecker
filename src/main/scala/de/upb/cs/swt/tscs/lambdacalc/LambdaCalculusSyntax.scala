@@ -16,11 +16,11 @@ class LambdaCalculusSyntax (val input : ParserInput) extends Parser {
   }
 
   def LambdaVariableTerm : Rule1[LambdaVariable] = rule {
-    capture(oneOrMore(CharPredicate.Alpha)) ~> LambdaVariable
+    capture(oneOrMore(CharPredicate.Alpha)) ~> UntypedLambdaVariable
   }
 
   def LambdaAbstractionTerm : Rule1[LambdaAbstraction] = rule {
-    'λ' ~ capture(oneOrMore(CharPredicate.Alpha)) ~ "." ~ Term ~> LambdaAbstraction
+    'λ' ~ LambdaVariableTerm ~ "." ~ Term ~> LambdaAbstraction
   }
 
   def LambdaApplicationTerm : Rule1[LambdaApplication] = rule {

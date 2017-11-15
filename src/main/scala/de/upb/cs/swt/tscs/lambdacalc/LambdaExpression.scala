@@ -13,7 +13,7 @@ trait LambdaExpression extends Evaluation {
     expr match {
       /* E-App1   */ case LambdaApplication(t1, t2) if progressPossible(t1) && !isValue(t1) => LambdaApplication(-->(t1), t2)
       /* E-App2   */ case LambdaApplication(v1, t2) if isValue(v1) && progressPossible(t2) => LambdaApplication(v1, -->(t2))
-      /* E-AppAbs */ case LambdaApplication(LambdaAbstraction(x,t12), v2) if isValue(v2) => substitute(matcher(new LambdaVariable(x),v2), t12)
+      /* E-AppAbs */ case LambdaApplication(LambdaAbstraction(x,t12), v2) if isValue(v2) => substitute(matcher(x,v2), t12)
       case λ : LambdaAbstraction => λ
       case _ => null
     }
