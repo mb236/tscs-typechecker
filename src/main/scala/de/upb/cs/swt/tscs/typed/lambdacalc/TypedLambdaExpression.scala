@@ -7,7 +7,7 @@ import de.upb.cs.swt.tscs.{Evaluation, Expression}
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Specifies the operation semantics of the λ calculus
+  * Defines a type checker for the typed λ calculus
   */
 trait TypedLambdaExpression extends LambdaExpression with Typecheck {
 
@@ -46,12 +46,12 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
       case _
       => Failure[TypeInformation](new TypingException(expr))
     }
-
+    /*
     print(expr.toString + " --- ")
     println(result match {
       case Success(t) => "Successfully typed to " + t
       case Failure(e) => "Typing failed"
-    })
+    })*/
     result
   }
 

@@ -6,7 +6,7 @@ import de.upb.cs.swt.tscs.typed.{BaseTypeInformation, FunctionTypeInformation, T
 import org.parboiled2.{CharPredicate, Parser, ParserInput, Rule1}
 
 /**
-  * A syntax definition for the λ calculus
+  * A syntax definition for the typed λ calculus
   */
 class TypedLambdaCalculusSyntax(input : ParserInput) extends LambdaCalculusSyntax(input) {
 

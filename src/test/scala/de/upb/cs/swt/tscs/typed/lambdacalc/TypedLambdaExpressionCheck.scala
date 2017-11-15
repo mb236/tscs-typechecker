@@ -5,7 +5,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import scala.util.{Failure, Success}
 
 /**
-  * Created by benhermann on 15.11.17.
+  * Checks for the type checker
   */
 class TypedLambdaExpressionCheck extends FlatSpec with Matchers {
   "λx.x : A" should "successfully typecheck" in {
