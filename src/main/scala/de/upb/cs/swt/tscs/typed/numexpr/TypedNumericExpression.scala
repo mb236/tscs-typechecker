@@ -1,7 +1,8 @@
 package de.upb.cs.swt.tscs.typed.numexpr
 
 import de.upb.cs.swt.tscs.numexpr.NumericExpression
-import de.upb.cs.swt.tscs.{Expression, Typecheck}
+import de.upb.cs.swt.tscs.typed.{TypeInformation, TypeInformations, Typecheck}
+import de.upb.cs.swt.tscs.Expression
 
 import scala.util.{Failure, Success, Try}
 

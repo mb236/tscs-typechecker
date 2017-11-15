@@ -1,5 +1,6 @@
 package de.upb.cs.swt.tscs.typed.numexpr
 
+import de.upb.cs.swt.tscs.typed.TypeInformation
 import de.upb.cs.swt.tscs.{Expression, Value}
 
 /**

@@ -1,5 +1,6 @@
 package de.upb.cs.swt.tscs.typed.numexpr
 
+import de.upb.cs.swt.tscs.typed.TypeInformations
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}

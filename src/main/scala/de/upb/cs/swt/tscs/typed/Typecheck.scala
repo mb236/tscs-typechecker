@@ -1,4 +1,6 @@
-package de.upb.cs.swt.tscs
+package de.upb.cs.swt.tscs.typed
+
+import de.upb.cs.swt.tscs.Expression
 
 import scala.util.Try
 

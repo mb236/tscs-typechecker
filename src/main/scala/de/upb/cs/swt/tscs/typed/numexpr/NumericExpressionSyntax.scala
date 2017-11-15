@@ -1,5 +1,6 @@
 package de.upb.cs.swt.tscs.typed.numexpr
 
+import de.upb.cs.swt.tscs.typed.{BaseTypeInformation, TypeInformation}
 import org.parboiled2.{Parser, ParserInput, Rule1}
 
 /**
@@ -60,11 +61,11 @@ class NumericExpressionSyntax(val input : ParserInput) extends Parser {
   }
 
   def BoolTypeInfo = rule {
-    capture("Bool") ~> TypeInformation
+    capture("Bool") ~> BaseTypeInformation
   }
 
   def NatTypeInfo = rule {
-    capture("Nat") ~> TypeInformation
+    capture("Nat") ~> BaseTypeInformation
   }
 
 }
