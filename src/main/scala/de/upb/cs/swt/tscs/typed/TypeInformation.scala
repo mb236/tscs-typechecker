@@ -3,9 +3,9 @@ package de.upb.cs.swt.tscs.typed
 /**
   * Created by benhermann on 02.11.17.
   */
-class TypeInformation(typeInfo : String)
+class TypeInformation(val typeInfo : String)
 
-case class BaseTypeInformation(typeInfo : String) extends TypeInformation(typeInfo) {
+case class BaseTypeInformation(override val typeInfo : String) extends TypeInformation(typeInfo) {
   override def toString: String = typeInfo
 }
 case class FunctionTypeInformation(sourceType : TypeInformation, targetType : TypeInformation)

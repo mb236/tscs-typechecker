@@ -1,6 +1,5 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc
 
-
 import de.upb.cs.swt.tscs.lambdacalc._
 import de.upb.cs.swt.tscs.typed.{BaseTypeInformation, FunctionTypeInformation, TypeInformation}
 import org.parboiled2.{CharPredicate, Parser, ParserInput, Rule1}
@@ -12,16 +11,29 @@ class TypedLambdaCalculusSyntax(input : ParserInput) extends LambdaCalculusSynta
 
   override def Term: Rule1[TypedLambdaExpression] = rule {
     LambdaVariableTerm |
-      LambdaAbstractionTerm ~> (widen(_ : LambdaAbstraction)) |
-      LambdaApplicationTerm ~> (widen(_ : LambdaApplication))
+    LambdaAbstractionTerm ~> (widen(_ : LambdaAbstraction)) |
+    LambdaApplicationTerm ~> (widen(_ : LambdaApplication)) |
+    MatchExpressionTerm
   }
 
   override def LambdaVariableTerm : Rule1[TypedLambdaVariable] = rule {
     capture(oneOrMore(CharPredicate.Alpha)) ~ optional (" : " ~ TypeInfo) ~> TypedLambdaVariable
   }
 
+  def MatchExpressionTerm = rule {
+    "case" ~ Term ~ "of" ~ oneOrMore(MatchCaseRule).separatedBy("|") ~> MatchExpression
+  }
+
+  def MatchCaseRule = rule {
+    "<" ~ FieldLabel ~ "=" ~ LambdaVariableTerm ~ ">" ~ "=>" ~ Term ~> MatchCase
+  }
+
+  def FieldLabel = rule {
+    capture(oneOrMore(CharPredicate.Alpha))
+  }
+
   def TypeInfo = rule {
-    BaseTypeInfo | FunctionType
+    BaseTypeInfo | FunctionType | VariantTypeInfo
   }
 
   def BaseTypeInfo : Rule1[TypeInformation] = rule {
@@ -32,6 +44,9 @@ class TypedLambdaCalculusSyntax(input : ParserInput) extends LambdaCalculusSynta
     "[" ~ TypeInfo ~ "->" ~ TypeInfo ~ "]" ~> FunctionTypeInformation
   }
 
+  def VariantTypeInfo : Rule1[TypeInformation] = rule {
+    "<" ~ oneOrMore(FieldLabel ~ ":" ~ TypeInfo ~> VariantTypeInformationPart).separatedBy(",") ~ ">" ~> VariantTypeInformation
+  }
 
   def widen(expression: LambdaExpression) : TypedLambdaExpression = {
     expression match {
