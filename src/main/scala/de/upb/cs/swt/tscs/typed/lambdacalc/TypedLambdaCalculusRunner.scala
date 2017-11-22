@@ -9,7 +9,9 @@ import scala.util.{Failure, Success}
   */
 object TypedLambdaCalculusRunner {
   def main(args: Array[String]): Unit = {
-    def input: ParserInput = "λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)"
+    //def input: ParserInput = "λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)"
+    def input: ParserInput = "cons[Bool] true cons[Bool] false cons[Bool] true nil[Bool]"
+    //def input: ParserInput = "isnil[A] cons[Bool] true nil[Bool]"
 
     val environment = new TypedLambdaCalculusSyntax(input)
     val result = environment.Term.run()
