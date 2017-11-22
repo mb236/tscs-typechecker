@@ -27,27 +27,34 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
     val result = expr match {
       /* T-Var */
       //T-True
-      case v: TypedLambdaVariable if v.variable == "true" && !v.typeAnnotation.isEmpty && v.typeAnnotation.get.toString == "Bool"
+      case v: TypedLambdaVariable if v.variable == "true" && !v.typeAnnotation.isEmpty && v.typeAnnotation.get == TypeInformations.Bool
         => storeAndWrap(v, v.typeAnnotation.get)
       case v: TypedLambdaVariable if v.variable == "true" && v.typeAnnotation.isEmpty
         => storeAndWrap(v, TypeInformations.Bool)
       //T-False
-      case v: TypedLambdaVariable if v.variable == "false" && !v.typeAnnotation.isEmpty && v.typeAnnotation.get.toString == "Bool"
+      case v: TypedLambdaVariable if v.variable == "false" && !v.typeAnnotation.isEmpty && v.typeAnnotation.get == TypeInformations.Bool
       => storeAndWrap(v, v.typeAnnotation.get)
       case v: TypedLambdaVariable if v.variable == "false" && v.typeAnnotation.isEmpty
       => storeAndWrap(v, TypeInformations.Bool)
-      /* T-Nil */ case n: NilList => storeAndWrap(n, new ListTypeInformation(n.typeInfo))
-      /* T-Cons */ case cons: ConsTermExpression if typecheck(cons.t1).isSuccess && typecheck(cons.t1).get == cons.typeInfo
+
+      /* T-Nil */
+      case n: NilList => storeAndWrap(n, new ListTypeInformation(n.typeInfo))
+
+      /* T-Cons */
+      case cons: ConsTermExpression if typecheck(cons.t1).isSuccess && typecheck(cons.t1).get == cons.typeInfo
         && typecheck(cons.t2).isSuccess && typecheck(cons.t2).get.isInstanceOf[ListTypeInformation] &&
         typecheck(cons.t2).get.asInstanceOf[ListTypeInformation].listType == cons.typeInfo
         => storeAndWrap(cons, new ListTypeInformation(cons.typeInfo))
-      /*T-IsNil */ case isNil : IsNil if typecheck(isNil.t1).isSuccess && typecheck(isNil.t1).get.isInstanceOf[ListTypeInformation]
+      /*T-IsNil */
+      case isNil : IsNil if typecheck(isNil.t1).isSuccess && typecheck(isNil.t1).get.isInstanceOf[ListTypeInformation]
         && typecheck(isNil.t1).get.asInstanceOf[ListTypeInformation].listType == isNil.typeInfo
         => storeAndWrap(isNil, TypeInformations.Bool)
-      /*T-Head */ case head : Head if typecheck(head.t1).isSuccess && typecheck(head.t1).get.isInstanceOf[ListTypeInformation]
+      /*T-Head */
+      case head : Head if typecheck(head.t1).isSuccess && typecheck(head.t1).get.isInstanceOf[ListTypeInformation]
         && typecheck(head.t1).get.asInstanceOf[ListTypeInformation].listType == head.typeInfo
       => storeAndWrap(head, head.typeInfo)
-      /*T-Tail */ case tail : Tail if typecheck(tail.t1).isSuccess && typecheck(tail.t1).get.isInstanceOf[ListTypeInformation]
+      /*T-Tail */
+      case tail : Tail if typecheck(tail.t1).isSuccess && typecheck(tail.t1).get.isInstanceOf[ListTypeInformation]
         && typecheck(tail.t1).get.asInstanceOf[ListTypeInformation].listType == tail.typeInfo
       => storeAndWrap(tail, new ListTypeInformation(tail.typeInfo))
 
