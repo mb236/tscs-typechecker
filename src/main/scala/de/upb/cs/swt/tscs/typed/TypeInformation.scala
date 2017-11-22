@@ -13,6 +13,10 @@ case class FunctionTypeInformation(sourceType : TypeInformation, targetType : Ty
   override def toString: String = "["+ sourceType + "->"+ targetType  + "]"
 }
 
+case class ListTypeInformation(listType : TypeInformation) extends TypeInformation("List " + listType.toString) {
+  override def toString: String = "List " + listType.toString
+}
+
 object TypeInformations {
   def Nat = new BaseTypeInformation("Nat")
   def Bool = new BaseTypeInformation("Bool")
