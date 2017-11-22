@@ -16,5 +16,6 @@ case class FunctionTypeInformation(sourceType : TypeInformation, targetType : Ty
 object TypeInformations {
   def Nat = new BaseTypeInformation("Nat")
   def Bool = new BaseTypeInformation("Bool")
+  def Unit = new BaseTypeInformation("Unit")
   def AbstractBaseType = new BaseTypeInformation("A")
 }

@@ -32,16 +32,16 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
       case v: TypedLambdaVariable if !v.typeAnnotation.isEmpty => storeAndWrap(v, v.typeAnnotation.get)
 
       /* T-Abs */
-      case abs : LambdaAbstraction
+      case abs: LambdaAbstraction
         if typecheck(abs.variable).isSuccess && typecheck(abs.term).isSuccess
       => storeAndWrap(abs, new FunctionTypeInformation(typecheck(abs.variable).get, typecheck(abs.term).get))
 
       /* T-App */
-      case app : LambdaApplication
+      case app: LambdaApplication
         if typecheck(app.function).isSuccess &&
-           typecheck(app.function).get.isInstanceOf[FunctionTypeInformation] &&
-           typecheck(app.argument).isSuccess &&
-           typecheck(app.argument).get == typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].sourceType
+          typecheck(app.function).get.isInstanceOf[FunctionTypeInformation] &&
+          typecheck(app.argument).isSuccess &&
+          typecheck(app.argument).get == typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].sourceType
       => storeAndWrap(app, typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].targetType)
       case _
       => Failure[TypeInformation](new TypingException(expr))
@@ -55,6 +55,25 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
     result
   }
 
+  override def -->(expr: Expression): Expression = {
+    expr match {
+      // E-CaseVariant
+      case MatchExpression(VariantExpression(fieldLabel, expr, _), cases) if isValue(expr) => {
+        val matchingCase = cases.filter(c => c.fieldLabel == fieldLabel).head
+        substitute(matcher(matchingCase.variable, expr), matchingCase.term)
+      }
 
+      // E-Case
+      case MatchExpression(expr, cases) if progressPossible(expr) =>
+        MatchExpression(-->(expr), cases)
+
+      // E-Variant
+      case VariantExpression(fieldLabel, expr, typeAnnotation) if progressPossible(expr) =>
+        VariantExpression(fieldLabel, -->(expr), typeAnnotation)
+
+      case _ => super.-->(expr)
+
+    }
+  }
 
 }

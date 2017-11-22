@@ -7,17 +7,17 @@ import org.parboiled2.{CharPredicate, Parser, ParserInput, Rule1}
 /**
   * A syntax definition for the typed λ calculus
   */
-class TypedLambdaCalculusSyntax(input : ParserInput) extends LambdaCalculusSyntax(input) {
+class TypedLambdaCalculusSyntax(input: ParserInput) extends LambdaCalculusSyntax(input) {
 
   override def Term: Rule1[TypedLambdaExpression] = rule {
+      MatchExpressionTerm|
     LambdaVariableTerm |
-    LambdaAbstractionTerm ~> (widen(_ : LambdaAbstraction)) |
-    LambdaApplicationTerm ~> (widen(_ : LambdaApplication)) |
-    MatchExpressionTerm
+      LambdaAbstractionTerm ~> (widen(_: LambdaAbstraction)) |
+      LambdaApplicationTerm ~> (widen(_: LambdaApplication))
   }
 
-  override def LambdaVariableTerm : Rule1[TypedLambdaVariable] = rule {
-    capture(oneOrMore(CharPredicate.Alpha)) ~ optional (" : " ~ TypeInfo) ~> TypedLambdaVariable
+  override def LambdaVariableTerm: Rule1[TypedLambdaVariable] = rule {
+    capture(oneOrMore(CharPredicate.Alpha)) ~ optional(" : " ~ TypeInfo) ~> TypedLambdaVariable
   }
 
   def MatchExpressionTerm = rule {
@@ -36,23 +36,23 @@ class TypedLambdaCalculusSyntax(input : ParserInput) extends LambdaCalculusSynta
     BaseTypeInfo | FunctionType | VariantTypeInfo
   }
 
-  def BaseTypeInfo : Rule1[TypeInformation] = rule {
+  def BaseTypeInfo: Rule1[TypeInformation] = rule {
     capture("A") ~> BaseTypeInformation
   }
 
-  def FunctionType : Rule1[TypeInformation] = rule {
+  def FunctionType: Rule1[TypeInformation] = rule {
     "[" ~ TypeInfo ~ "->" ~ TypeInfo ~ "]" ~> FunctionTypeInformation
   }
 
-  def VariantTypeInfo : Rule1[TypeInformation] = rule {
+  def VariantTypeInfo: Rule1[TypeInformation] = rule {
     "<" ~ oneOrMore(FieldLabel ~ ":" ~ TypeInfo ~> VariantTypeInformationPart).separatedBy(",") ~ ">" ~> VariantTypeInformation
   }
 
-  def widen(expression: LambdaExpression) : TypedLambdaExpression = {
+  def widen(expression: LambdaExpression): TypedLambdaExpression = {
     expression match {
       case UntypedLambdaVariable(v) => new TypedLambdaVariable(v, Option.empty)
-      case LambdaApplication(f,a) => new LambdaApplication(f,a) with TypedLambdaExpression
-      case LambdaAbstraction(v,t) => new LambdaAbstraction(v,t) with TypedLambdaExpression
+      case LambdaApplication(f, a) => new LambdaApplication(f, a) with TypedLambdaExpression
+      case LambdaAbstraction(v, t) => new LambdaAbstraction(v, t) with TypedLambdaExpression
     }
   }
 }
