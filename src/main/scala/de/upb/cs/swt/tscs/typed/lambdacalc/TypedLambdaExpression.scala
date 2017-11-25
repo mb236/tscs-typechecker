@@ -39,21 +39,16 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
       case n: NilList => storeAndWrap(n, new ListTypeInformation(n.typeInfo))
 
       /* T-Cons */
-      case cons: ConsTermExpression if typecheck(cons.t1).isSuccess && typecheck(cons.t1).get == cons.typeInfo
-        && typecheck(cons.t2).isSuccess && typecheck(cons.t2).get.isInstanceOf[ListTypeInformation] &&
-        typecheck(cons.t2).get.asInstanceOf[ListTypeInformation].listType == cons.typeInfo
+      case cons: ConsTermExpression if T_Cons_Premise(cons)
       => storeAndWrap(cons, new ListTypeInformation(cons.typeInfo))
       /*T-IsNil */
-      case isNil: IsNil if typecheck(isNil.t1).isSuccess && typecheck(isNil.t1).get.isInstanceOf[ListTypeInformation]
-        && typecheck(isNil.t1).get.asInstanceOf[ListTypeInformation].listType == isNil.typeInfo
+      case isNil: IsNil if T_IsNil_Premise(isNil)
       => storeAndWrap(isNil, TypeInformations.Bool)
       /*T-Head */
-      case head: Head if typecheck(head.t1).isSuccess && typecheck(head.t1).get.isInstanceOf[ListTypeInformation]
-        && typecheck(head.t1).get.asInstanceOf[ListTypeInformation].listType == head.typeInfo
+      case head: Head if T_Head_Premise(head)
       => storeAndWrap(head, head.typeInfo)
       /*T-Tail */
-      case tail: Tail if typecheck(tail.t1).isSuccess && typecheck(tail.t1).get.isInstanceOf[ListTypeInformation]
-        && typecheck(tail.t1).get.asInstanceOf[ListTypeInformation].listType == tail.typeInfo
+      case tail: Tail if T_Tail_Premise(tail)
       => storeAndWrap(tail, new ListTypeInformation(tail.typeInfo))
 
 
@@ -87,6 +82,30 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
     result
   }
 
+
+  private def T_Tail_Premise(tail: Tail) =
+    typecheck(tail.t1) match {
+      case Success(t1: ListTypeInformation) => t1.listType == tail.typeInfo
+      case _ => false
+    }
+
+  private def T_Head_Premise(head: Head) =
+    typecheck(head.t1) match {
+      case Success(t1: ListTypeInformation) => t1.listType == head.typeInfo
+      case _ => false
+    }
+
+  private def T_IsNil_Premise(isNil: IsNil) =
+    typecheck(isNil.t1) match {
+      case Success(t1: ListTypeInformation) => t1.listType == isNil.typeInfo
+      case _ => false
+    }
+
+  private def T_Cons_Premise(cons: ConsTermExpression) =
+    (typecheck(cons.t1), typecheck(cons.t2)) match {
+      case (Success(t1), Success(t2: ListTypeInformation)) => t1 == cons.typeInfo && t2.listType == cons.typeInfo
+      case _ => false
+    }
 
   private def T_False_Premise(v: TypedLambdaVariable) =
     v.variable == "false" &&
