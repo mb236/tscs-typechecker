@@ -17,7 +17,7 @@ case class TypedLambdaVariable(val variable : String, typeAnnotation: Option[Typ
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {
-      case that : TypedLambdaVariable =>  that.variable.equals(this.variable) && that.typeAnnotation==this.typeAnnotation
+      case that : TypedLambdaVariable =>  that.variable.equals(this.variable)
       case _ => false
     }
   }

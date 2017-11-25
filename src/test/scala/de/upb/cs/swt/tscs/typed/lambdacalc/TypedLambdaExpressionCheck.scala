@@ -1,6 +1,6 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc
 
-import de.upb.cs.swt.tscs.typed.TypeInformations
+import de.upb.cs.swt.tscs.typed.{FunctionTypeInformation, TypeInformations}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}
@@ -106,5 +106,33 @@ class TypedLambdaExpressionCheck extends FlatSpec with Matchers {
     environment shouldBe a[Success[_]]
     val expression = environment.get.-->*()
     expression shouldNot be(null)
+  }
+
+  "λz : A.λx : [A->A].λy : [A->A].(x (y z))" should "typecheck as [A->[[A->A]->[[A->A]->A]]]" in {
+    val env = new TypedLambdaCalculusSyntax("λz : A.λx : [A->A].λy : [A->A].(x (y z))").Term.run()
+    env shouldBe a[Success[_]]
+    env.get.typecheck() shouldEqual
+      Success(
+        FunctionTypeInformation(
+          TypeInformations.AbstractBaseType,
+          FunctionTypeInformation(
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+            FunctionTypeInformation(
+              FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+              TypeInformations.AbstractBaseType))))
+  }
+
+  "λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)" should "typecheck as [[[A->A]->[A->A]]->[[A->A]->A]]" in {
+     val env = new TypedLambdaCalculusSyntax("λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)").Term.run()
+    env shouldBe a[Success[_]]
+    env.get.typecheck() shouldEqual
+      Success(
+        FunctionTypeInformation(
+          FunctionTypeInformation(
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType)),
+          FunctionTypeInformation(
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+            TypeInformations.AbstractBaseType)))
   }
 }
