@@ -1,9 +1,9 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc
 
-import de.upb.cs.swt.tscs.lambdacalc.{LambdaAbstraction, LambdaApplication, LambdaExpression, UntypedLambdaVariable}
+import de.upb.cs.swt.tscs.Expression
+import de.upb.cs.swt.tscs.lambdacalc.{LambdaAbstraction, LambdaApplication, LambdaExpression}
 import de.upb.cs.swt.tscs.typed._
 import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list._
-import de.upb.cs.swt.tscs.{Evaluation, Expression}
 
 import scala.util.{Failure, Success, Try}
 
@@ -28,14 +28,11 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
     val result = expr match {
       /* T-Var */
       //T-True
-      case v: TypedLambdaVariable if v.variable == "true" && !v.typeAnnotation.isEmpty && v.typeAnnotation.get == TypeInformations.Bool
-        => storeAndWrap(v, v.typeAnnotation.get)
-      case v: TypedLambdaVariable if v.variable == "true" && v.typeAnnotation.isEmpty
-        => storeAndWrap(v, TypeInformations.Bool)
+      case v: TypedLambdaVariable if T_True_Premise(v)
+      => storeAndWrap(v, TypeInformations.Bool)
+
       //T-False
-      case v: TypedLambdaVariable if v.variable == "false" && !v.typeAnnotation.isEmpty && v.typeAnnotation.get == TypeInformations.Bool
-      => storeAndWrap(v, v.typeAnnotation.get)
-      case v: TypedLambdaVariable if v.variable == "false" && v.typeAnnotation.isEmpty
+      case v: TypedLambdaVariable if T_False_Premise(v)
       => storeAndWrap(v, TypeInformations.Bool)
 
       /* T-Nil */
@@ -45,17 +42,17 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
       case cons: ConsTermExpression if typecheck(cons.t1).isSuccess && typecheck(cons.t1).get == cons.typeInfo
         && typecheck(cons.t2).isSuccess && typecheck(cons.t2).get.isInstanceOf[ListTypeInformation] &&
         typecheck(cons.t2).get.asInstanceOf[ListTypeInformation].listType == cons.typeInfo
-        => storeAndWrap(cons, new ListTypeInformation(cons.typeInfo))
+      => storeAndWrap(cons, new ListTypeInformation(cons.typeInfo))
       /*T-IsNil */
-      case isNil : IsNil if typecheck(isNil.t1).isSuccess && typecheck(isNil.t1).get.isInstanceOf[ListTypeInformation]
+      case isNil: IsNil if typecheck(isNil.t1).isSuccess && typecheck(isNil.t1).get.isInstanceOf[ListTypeInformation]
         && typecheck(isNil.t1).get.asInstanceOf[ListTypeInformation].listType == isNil.typeInfo
-        => storeAndWrap(isNil, TypeInformations.Bool)
+      => storeAndWrap(isNil, TypeInformations.Bool)
       /*T-Head */
-      case head : Head if typecheck(head.t1).isSuccess && typecheck(head.t1).get.isInstanceOf[ListTypeInformation]
+      case head: Head if typecheck(head.t1).isSuccess && typecheck(head.t1).get.isInstanceOf[ListTypeInformation]
         && typecheck(head.t1).get.asInstanceOf[ListTypeInformation].listType == head.typeInfo
       => storeAndWrap(head, head.typeInfo)
       /*T-Tail */
-      case tail : Tail if typecheck(tail.t1).isSuccess && typecheck(tail.t1).get.isInstanceOf[ListTypeInformation]
+      case tail: Tail if typecheck(tail.t1).isSuccess && typecheck(tail.t1).get.isInstanceOf[ListTypeInformation]
         && typecheck(tail.t1).get.asInstanceOf[ListTypeInformation].listType == tail.typeInfo
       => storeAndWrap(tail, new ListTypeInformation(tail.typeInfo))
 
@@ -67,16 +64,16 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
       case v: TypedLambdaVariable if !v.typeAnnotation.isEmpty => storeAndWrap(v, v.typeAnnotation.get)
 
       /* T-Abs */
-      case abs : LambdaAbstraction
+      case abs: LambdaAbstraction
         if typecheck(abs.variable).isSuccess && typecheck(abs.term).isSuccess
       => storeAndWrap(abs, new FunctionTypeInformation(typecheck(abs.variable).get, typecheck(abs.term).get))
 
       /* T-App */
-      case app : LambdaApplication
+      case app: LambdaApplication
         if typecheck(app.function).isSuccess &&
-           typecheck(app.function).get.isInstanceOf[FunctionTypeInformation] &&
-           typecheck(app.argument).isSuccess &&
-           typecheck(app.argument).get == typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].sourceType
+          typecheck(app.function).get.isInstanceOf[FunctionTypeInformation] &&
+          typecheck(app.argument).isSuccess &&
+          typecheck(app.argument).get == typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].sourceType
       => storeAndWrap(app, typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].targetType)
       case _
       => Failure[TypeInformation](new TypingException(expr))
@@ -91,5 +88,19 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
   }
 
 
+  private def T_False_Premise(v: TypedLambdaVariable) =
+    v.variable == "false" &&
+      (v.typeAnnotation match {
+        case None => true
+        case Some(t) => t == TypeInformations.Bool
+        case _ => false
+      })
 
+  private def T_True_Premise(v: TypedLambdaVariable) =
+    v.variable == "true" &&
+      (v.typeAnnotation match {
+        case None => true
+        case Some(t) => t == TypeInformations.Bool
+        case _ => false
+      })
 }
