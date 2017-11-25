@@ -2,6 +2,7 @@ package de.upb.cs.swt.tscs.typed.lambdacalc
 
 import de.upb.cs.swt.tscs.lambdacalc.{LambdaAbstraction, LambdaApplication, LambdaExpression, UntypedLambdaVariable}
 import de.upb.cs.swt.tscs.typed._
+import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list._
 import de.upb.cs.swt.tscs.{Evaluation, Expression}
 
 import scala.util.{Failure, Success, Try}

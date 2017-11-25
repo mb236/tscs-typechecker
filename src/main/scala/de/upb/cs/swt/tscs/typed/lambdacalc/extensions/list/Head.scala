@@ -1,8 +1,8 @@
-package de.upb.cs.swt.tscs.typed.lambdacalc
+package de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list
 
 import de.upb.cs.swt.tscs.Expression
-import de.upb.cs.swt.tscs.lambdacalc.LambdaExpression
 import de.upb.cs.swt.tscs.typed.TypeInformation
+import de.upb.cs.swt.tscs.typed.lambdacalc.TypedLambdaExpression
 
 /**
   * Represents a head term in the λ calculus

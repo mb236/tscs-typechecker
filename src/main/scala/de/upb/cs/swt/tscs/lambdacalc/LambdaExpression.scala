@@ -1,7 +1,7 @@
 package de.upb.cs.swt.tscs.lambdacalc
 
-import de.upb.cs.swt.tscs.typed.TypeInformations
 import de.upb.cs.swt.tscs.typed.lambdacalc._
+import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list._
 import de.upb.cs.swt.tscs.{Evaluation, Expression, Value}
 
 /**
