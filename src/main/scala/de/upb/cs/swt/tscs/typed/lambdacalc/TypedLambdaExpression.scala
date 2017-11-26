@@ -10,62 +10,41 @@ import scala.util.{Failure, Success, Try}
 /**
   * Defines a type checker for the typed λ calculus
   */
-trait TypedLambdaExpression extends LambdaExpression with Typecheck {
+trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTypeCheck {
 
-  override def typecheck(): Try[_] = typecheck(this)
+  override def typecheck(): Try[_] = typecheck(this,scala.collection.mutable.HashMap())
 
-  val Gamma = new scala.collection.mutable.HashMap[Expression, TypeInformation]
-
-  def storeAndWrap(e: Expression, t: TypeInformation): Try[TypeInformation] = {
-    Gamma.put(e, t)
-    Success(t)
-  }
-
-  override def typecheck(expr: Expression): Try[TypeInformation] = {
+  override def typecheck(expr: Expression, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation]): Try[TypeInformation] = {
+    println("TypedLambdaExpression")
     // Just an optimization
-    if (Gamma.contains(expr)) return Success(Gamma(expr))
+    if (gamma.contains(expr)) return Success(gamma(expr))
 
     val result = expr match {
       /* T-Var */
       //T-True
       case v: TypedLambdaVariable if T_True_Premise(v)
-      => storeAndWrap(v, TypeInformations.Bool)
+      => storeAndWrap(v, TypeInformations.Bool, gamma)
 
       //T-False
       case v: TypedLambdaVariable if T_False_Premise(v)
-      => storeAndWrap(v, TypeInformations.Bool)
+      => storeAndWrap(v, TypeInformations.Bool, gamma)
 
-      /* T-Nil */
-      case n: NilList => storeAndWrap(n, ListTypeInformation(n.typeInfo))
-
-      /* T-Cons */
-      case cons: ConsTermExpression if T_Cons_Premise(cons)
-      => storeAndWrap(cons, ListTypeInformation(cons.typeInfo))
-      /*T-IsNil */
-      case isNil: IsNil if T_IsNil_Premise(isNil)
-      => storeAndWrap(isNil, TypeInformations.Bool)
-      /*T-Head */
-      case head: Head if T_Head_Premise(head)
-      => storeAndWrap(head, head.typeInfo)
-      /*T-Tail */
-      case tail: Tail if T_Tail_Premise(tail)
-      => storeAndWrap(tail, ListTypeInformation(tail.typeInfo))
-
-
+      case le: ListExpression => super.typecheck(le, gamma)
 
       // Assume abstract base type for variables
-      case v: TypedLambdaVariable if v.typeAnnotation.isEmpty && v.variable != "true" && v.variable != "false" => storeAndWrap(v, TypeInformations.AbstractBaseType)
+      case v: TypedLambdaVariable if v.typeAnnotation.isEmpty && v.variable != "true" && v.variable != "false"
+      => storeAndWrap(v, TypeInformations.AbstractBaseType, gamma)
       // Or simply trust the annotation
-      case v: TypedLambdaVariable if v.typeAnnotation.isDefined => storeAndWrap(v, v.typeAnnotation.get)
+      case v: TypedLambdaVariable if v.typeAnnotation.isDefined => storeAndWrap(v, v.typeAnnotation.get, gamma)
 
       /* T-Abs */
       case abs: LambdaAbstraction
-        if typecheck(abs.variable).isSuccess && typecheck(abs.term).isSuccess
-      => storeAndWrap(abs, FunctionTypeInformation(typecheck(abs.variable).get, typecheck(abs.term).get))
+        if typecheck(abs.variable, gamma).isSuccess && typecheck(abs.term, gamma).isSuccess
+      => storeAndWrap(abs, FunctionTypeInformation(typecheck(abs.variable, gamma).get, typecheck(abs.term, gamma).get), gamma)
 
       /* T-App */
-      case app: LambdaApplication if T_App_Premise(app)
-      => storeAndWrap(app, typecheck(app.function).get.asInstanceOf[FunctionTypeInformation].targetType)
+      case app: LambdaApplication if T_App_Premise(app, gamma)
+      => storeAndWrap(app, typecheck(app.function, gamma).get.asInstanceOf[FunctionTypeInformation].targetType, gamma)
       case _
       => Failure[TypeInformation](new TypingException(expr))
     }
@@ -79,33 +58,9 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck {
   }
 
 
-  private def T_App_Premise(app: LambdaApplication) =
-    (typecheck(app.function), typecheck(app.argument)) match {
+  private def T_App_Premise(app: LambdaApplication, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation]) =
+    (typecheck(app.function, gamma), typecheck(app.argument, gamma)) match {
       case (Success(ft: FunctionTypeInformation), Success(at)) => at == ft.sourceType
-      case _ => false
-    }
-
-  private def T_Tail_Premise(tail: Tail) =
-    typecheck(tail.t1) match {
-      case Success(t1: ListTypeInformation) => t1.listType == tail.typeInfo
-      case _ => false
-    }
-
-  private def T_Head_Premise(head: Head) =
-    typecheck(head.t1) match {
-      case Success(t1: ListTypeInformation) => t1.listType == head.typeInfo
-      case _ => false
-    }
-
-  private def T_IsNil_Premise(isNil: IsNil) =
-    typecheck(isNil.t1) match {
-      case Success(t1: ListTypeInformation) => t1.listType == isNil.typeInfo
-      case _ => false
-    }
-
-  private def T_Cons_Premise(cons: ConsTermExpression) =
-    (typecheck(cons.t1), typecheck(cons.t2)) match {
-      case (Success(t1), Success(t2: ListTypeInformation)) => t1 == cons.typeInfo && t2.listType == cons.typeInfo
       case _ => false
     }
 
