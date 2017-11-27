@@ -1,7 +1,8 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc.extensions
 
 import de.upb.cs.swt.tscs.typed.TypeInformations
-import de.upb.cs.swt.tscs.typed.lambdacalc.{ConsValueExpression, NilList, TypedLambdaCalculusSyntax, TypedLambdaVariable}
+import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list.{ConsValueExpression, NilList}
+import de.upb.cs.swt.tscs.typed.lambdacalc.{TypedLambdaCalculusSyntax, TypedLambdaVariable}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}
