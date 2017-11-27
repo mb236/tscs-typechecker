@@ -15,7 +15,7 @@ trait TypedNumericExpression extends NumericExpression with Typecheck {
 
   val Gamma = new scala.collection.mutable.HashMap[Expression, TypeInformation]
 
-  override def typecheck(expr: Expression): Try[TypeInformation] = {
+  override def typecheck(expr: Expression, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation] = scala.collection.mutable.HashMap()): Try[TypeInformation] = {
     expr match {
       /* T-True */
       case e: ValueExpr
