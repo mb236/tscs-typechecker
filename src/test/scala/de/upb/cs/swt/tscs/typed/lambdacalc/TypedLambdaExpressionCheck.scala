@@ -1,6 +1,6 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc
 
-import de.upb.cs.swt.tscs.typed.{TypeInformation, TypeInformations}
+import de.upb.cs.swt.tscs.typed.{FunctionTypeInformation, TypeInformations}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}
@@ -11,78 +11,70 @@ import scala.util.{Failure, Success}
 class TypedLambdaExpressionCheck extends FlatSpec with Matchers {
   "λx.x : A" should "successfully typecheck" in {
     var parserResult = new TypedLambdaCalculusSyntax("λx.x : A").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
+    parserResult shouldBe a[Success[_]]
+    parserResult.get.typecheck() shouldBe a[Success[_]]
   }
 
   "λx : [A->A].λy : A.((x y) x)" should "successfully parse" in {
     var parserResult = new TypedLambdaCalculusSyntax("λx : [A->A].λy : A.((x y) x)").Term.run()
-    parserResult shouldBe a [Success[_]]
+    parserResult shouldBe a[Success[_]]
   }
 
   it should "not successfully typecheck" in {
     var parserResult = new TypedLambdaCalculusSyntax("λx : [A->A].λy : A.((x y) x)").Term.run()
-    parserResult.get.typecheck() shouldBe a [Failure[_]]
+    parserResult.get.typecheck() shouldBe a[Failure[_]]
   }
 
   "λz : A.λx : [A->A].λy : [A->A].(x (y z))" should "successfully typecheck" in {
     var parserResult = new TypedLambdaCalculusSyntax("λz : A.λx : [A->A].λy : [A->A].(x (y z))").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
+    parserResult shouldBe a[Success[_]]
+    parserResult.get.typecheck() shouldBe a[Success[_]]
   }
 
   "(λx.x x)" should "successfully typecheck" in {
     var parserResult = new TypedLambdaCalculusSyntax("(λx.x x)").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
+    parserResult shouldBe a[Success[_]]
+    parserResult.get.typecheck() shouldBe a[Success[_]]
   }
 
   "λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)" should "successfully typecheck" in {
     var parserResult = new TypedLambdaCalculusSyntax("λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
+    parserResult shouldBe a[Success[_]]
+    parserResult.get.typecheck() shouldBe a[Success[_]]
   }
 
-  "cons[Bool] true cons[Bool] false cons[Bool] true nil[Bool]" should "successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("cons[Bool] true cons[Bool] false cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
+  "λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)" should "evaluate correctly" in {
+    val environment = new TypedLambdaCalculusSyntax("λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)").Term.run()
+    environment shouldBe a[Success[_]]
+    val expression = environment.get.-->*()
+    expression shouldNot be(null)
   }
 
-  "isnil[Bool] cons[Bool] true nil[Bool]" should "successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("isnil[Bool] cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
+  "λz : A.λx : [A->A].λy : [A->A].(x (y z))" should "typecheck as [A->[[A->A]->[[A->A]->A]]]" in {
+    val env = new TypedLambdaCalculusSyntax("λz : A.λx : [A->A].λy : [A->A].(x (y z))").Term.run()
+    env shouldBe a[Success[_]]
+    env.get.typecheck() shouldEqual
+      Success(
+        FunctionTypeInformation(
+          TypeInformations.AbstractBaseType,
+          FunctionTypeInformation(
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+            FunctionTypeInformation(
+              FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+              TypeInformations.AbstractBaseType))))
   }
 
-  "isnil[A] cons[Bool] true nil[Bool]" should "not successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("isnil[A] cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Failure[_]]
+  "λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)" should "typecheck as [[[A->A]->[A->A]]->[[A->A]->A]]" in {
+     val env = new TypedLambdaCalculusSyntax("λx : [[A->A]->[A->A]].λy : [A->A].((x y) c)").Term.run()
+    env shouldBe a[Success[_]]
+    env.get.typecheck() shouldEqual
+      Success(
+        FunctionTypeInformation(
+          FunctionTypeInformation(
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType)),
+          FunctionTypeInformation(
+            FunctionTypeInformation(TypeInformations.AbstractBaseType, TypeInformations.AbstractBaseType),
+            TypeInformations.AbstractBaseType)))
   }
-
-  "head[Bool] cons[Bool] true nil[Bool]" should "successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("head[Bool] cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
-  }
-
-  "head[A] cons[Bool] true nil[Bool]" should "not successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("head[A] cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Failure[_]]
-  }
-
-  "tail[Bool] cons[Bool] true nil[Bool]" should "successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("tail[Bool] cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Success[_]]
-  }
-
-  "tail[A] cons[Bool] true nil[Bool]" should "not successfully typecheck" in {
-    var parserResult = new TypedLambdaCalculusSyntax("tail[A] cons[Bool] true nil[Bool]").Term.run()
-    parserResult shouldBe a [Success[_]]
-    parserResult.get.typecheck() shouldBe a [Failure[_]]
-  }
-
 }
