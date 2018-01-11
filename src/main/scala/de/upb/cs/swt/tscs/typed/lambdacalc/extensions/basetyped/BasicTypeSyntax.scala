@@ -1,7 +1,7 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc.extensions.basetyped
 
 import de.upb.cs.swt.tscs.lambdacalc._
-import de.upb.cs.swt.tscs.typed.{BaseTypeInformation, FunctionTypeInformation, TypeInformation}
+import de.upb.cs.swt.tscs.typed.{SecTypeInformation, _}
 import de.upb.cs.swt.tscs.typed.lambdacalc.{TypedLambdaExpression, TypedLambdaVariable}
 import org.parboiled2.{CharPredicate, Rule1}
 
@@ -18,25 +18,28 @@ trait BasicTypeSyntax extends LambdaCalculusSyntax{
   }
 
   override def LambdaVariableTerm : Rule1[TypedLambdaVariable] = rule {
-    capture(oneOrMore(CharPredicate.Alpha)) ~ optional (" : " ~ TypeInfo) ~> TypedLambdaVariable
+    capture(oneOrMore(CharPredicate.Alpha)) ~ optional(" : " ~ TypeInfo) ~> TypedLambdaVariable
   }
 
-  def TypeInfo = rule {
+  def TypeInfo : Rule1[SecTypeInformation] = rule {
     BaseTypeInfo | BoolTypeInfo | FunctionType
   }
 
-  def BaseTypeInfo : Rule1[TypeInformation] = rule {
-    capture("A") ~> BaseTypeInformation
+  def BaseTypeInfo : Rule1[SecTypeInformation] = rule {
+    capture("A") ~ SecLevel ~> BaseTypeInformation
   }
 
-  def BoolTypeInfo : Rule1[TypeInformation] = rule {
-    capture("Bool") ~> BaseTypeInformation
+  def BoolTypeInfo : Rule1[SecTypeInformation] = rule {
+    capture("Bool") ~ SecLevel ~> BaseTypeInformation
   }
 
-  def FunctionType : Rule1[TypeInformation] = rule {
+  def FunctionType : Rule1[SecTypeInformation] = rule {
     "[" ~ TypeInfo ~ "->" ~ TypeInfo ~ "]" ~> FunctionTypeInformation
   }
 
+  def SecLevel : Rule1[SecurityLevel] = rule {
+    "(" ~ capture(oneOrMore(CharPredicate.Alpha)) ~ ")" ~> SecurityLevel
+  }
 
   def widen(expression: LambdaExpression) : TypedLambdaExpression = {
     expression match {

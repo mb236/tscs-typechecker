@@ -3,14 +3,13 @@ package de.upb.cs.swt.tscs.typed.lambdacalc
 import de.upb.cs.swt.tscs.Expression
 import de.upb.cs.swt.tscs.lambdacalc.{LambdaAbstraction, LambdaApplication, LambdaExpression}
 import de.upb.cs.swt.tscs.typed._
-import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list._
 
 import scala.util.{Failure, Success, Try}
 
 /**
   * Defines a type checker for the typed λ calculus
   */
-trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTypeCheck {
+trait TypedLambdaExpression extends LambdaExpression with Typecheck {
 
   override def typecheck(): Try[_] = typecheck(this,scala.collection.mutable.HashMap())
 
@@ -22,14 +21,18 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTyp
     val result = expr match {
       /* T-Var */
       //T-True
-      case v: TypedLambdaVariable if T_True_Premise(v)
-      => storeAndWrap(v, TypeInformations.Bool, gamma)
+      case v: TypedLambdaVariable if T_True_Low_Premise(v)
+      => storeAndWrap(v, TypeInformations.BoolLow, gamma)
+
+      case v: TypedLambdaVariable if T_True_High_Premise(v)
+      => storeAndWrap(v, TypeInformations.BoolHigh, gamma)
 
       //T-False
-      case v: TypedLambdaVariable if T_False_Premise(v)
-      => storeAndWrap(v, TypeInformations.Bool, gamma)
+      case v: TypedLambdaVariable if T_False_Low_Premise(v)
+      => storeAndWrap(v, TypeInformations.BoolLow, gamma)
 
-      case le: ListExpression => super.typecheck(le, gamma)
+      case v: TypedLambdaVariable if T_False_High_Premise(v)
+      => storeAndWrap(v, TypeInformations.BoolHigh, gamma)
 
       // Assume abstract base type for variables
       case v: TypedLambdaVariable if v.typeAnnotation.isEmpty && v.variable != "true" && v.variable != "false"
@@ -40,7 +43,9 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTyp
       /* T-Abs */
       case abs: LambdaAbstraction
         if typecheck(abs.variable, gamma).isSuccess && typecheck(abs.term, gamma).isSuccess
-      => storeAndWrap(abs, FunctionTypeInformation(typecheck(abs.variable, gamma).get, typecheck(abs.term, gamma).get), gamma)
+      => storeAndWrap(abs, FunctionTypeInformation(
+          typecheck(abs.variable, gamma).get.asInstanceOf[SecTypeInformation],
+          typecheck(abs.term, gamma).get.asInstanceOf[SecTypeInformation]), gamma)
 
       /* T-App */
       case app: LambdaApplication if T_App_Premise(app, gamma)
@@ -64,19 +69,35 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTyp
       case _ => false
     }
 
-  private def T_False_Premise(v: TypedLambdaVariable) =
+  private def T_False_Low_Premise(v: TypedLambdaVariable) =
     v.variable == "false" &&
       (v.typeAnnotation match {
         case None => true
-        case Some(t) => t == TypeInformations.Bool
+        case Some(t) => t == TypeInformations.BoolLow
         case _ => false
       })
 
-  private def T_True_Premise(v: TypedLambdaVariable) =
+  private def T_False_High_Premise(v: TypedLambdaVariable) =
+    v.variable == "false" &&
+      (v.typeAnnotation match {
+        case None => true
+        case Some(t) => t == TypeInformations.BoolHigh
+        case _ => false
+      })
+
+  private def T_True_Low_Premise(v: TypedLambdaVariable) =
     v.variable == "true" &&
       (v.typeAnnotation match {
         case None => true
-        case Some(t) => t == TypeInformations.Bool
+        case Some(t) => t == TypeInformations.BoolLow
+        case _ => false
+      })
+
+  private def T_True_High_Premise(v: TypedLambdaVariable) =
+    v.variable == "true" &&
+      (v.typeAnnotation match {
+        case None => true
+        case Some(t) => t == TypeInformations.BoolHigh
         case _ => false
       })
 }

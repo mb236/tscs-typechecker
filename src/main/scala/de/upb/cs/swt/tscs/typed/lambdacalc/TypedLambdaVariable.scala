@@ -1,7 +1,7 @@
 package de.upb.cs.swt.tscs.typed.lambdacalc
 
 import de.upb.cs.swt.tscs.lambdacalc.LambdaVariable
-import de.upb.cs.swt.tscs.typed.TypeInformation
+import de.upb.cs.swt.tscs.typed.{SecTypeInformation, TypeInformation}
 
 /**
   * Represents a variable in the λ calculus
