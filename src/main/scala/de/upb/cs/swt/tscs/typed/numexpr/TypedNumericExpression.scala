@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
   */
 trait TypedNumericExpression extends NumericExpression with Typecheck {
 
-  override def typecheck(): Try[_] = typecheck(this)
+  override def typecheck(): Try[TypeInformation] = typecheck(this)
 
   val Gamma = new scala.collection.mutable.HashMap[Expression, TypeInformation]
 

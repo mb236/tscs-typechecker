@@ -3,6 +3,7 @@ package de.upb.cs.swt.tscs.typed.lambdacalc
 import de.upb.cs.swt.tscs.Expression
 import de.upb.cs.swt.tscs.lambdacalc.{LambdaAbstraction, LambdaApplication, LambdaExpression}
 import de.upb.cs.swt.tscs.typed._
+import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.conditional.ConditionalTypeCheck
 import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list._
 
 import scala.util.{Failure, Success, Try}
@@ -10,9 +11,9 @@ import scala.util.{Failure, Success, Try}
 /**
   * Defines a type checker for the typed λ calculus
   */
-trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTypeCheck {
+trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTypeCheck with ConditionalTypeCheck {
 
-  override def typecheck(): Try[_] = typecheck(this,scala.collection.mutable.HashMap())
+  override def typecheck(): Try[TypeInformation] = typecheck(this,scala.collection.mutable.HashMap())
 
   override def typecheck(expr: Expression, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation]): Try[TypeInformation] = {
     println("TypedLambdaExpression")
@@ -46,7 +47,7 @@ trait TypedLambdaExpression extends LambdaExpression with Typecheck with ListTyp
       case app: LambdaApplication if T_App_Premise(app, gamma)
       => storeAndWrap(app, typecheck(app.function, gamma).get.asInstanceOf[FunctionTypeInformation].targetType, gamma)
       case _
-      => Failure[TypeInformation](new TypingException(expr))
+      => super.typecheck(expr, gamma)
     }
     /*
     print(expr.toString + " --- ")

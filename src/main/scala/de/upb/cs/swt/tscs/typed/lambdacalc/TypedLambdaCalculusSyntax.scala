@@ -2,6 +2,7 @@ package de.upb.cs.swt.tscs.typed.lambdacalc
 
 
 import de.upb.cs.swt.tscs.lambdacalc._
+import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.conditional.ConditionalSyntax
 import de.upb.cs.swt.tscs.typed.lambdacalc.extensions.list._
 import org.parboiled2.ParserInput
 
@@ -10,7 +11,7 @@ import org.parboiled2.ParserInput
   * as separate as possible.
   */
 class TypedLambdaCalculusSyntax(input : ParserInput) extends LambdaCalculusSyntax(input)
-with ListSyntax
+with ListSyntax with ConditionalSyntax
 {
 
 }

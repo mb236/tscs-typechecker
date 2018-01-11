@@ -2,7 +2,7 @@ package de.upb.cs.swt.tscs.typed
 
 import de.upb.cs.swt.tscs.Expression
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 /**
   * Basic trait for type checking
@@ -14,7 +14,9 @@ trait Typecheck extends Expression {
     Success(t)
   }
 
-  def typecheck() : Try[_] = typecheck(this, scala.collection.mutable.HashMap())
+  def typecheck() : Try[TypeInformation] = typecheck(this, scala.collection.mutable.HashMap())
 
-  def typecheck(expr : Expression, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation]) : Try[_]
+  def typecheck(expr : Expression, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation]) : Try[TypeInformation] = {
+    Failure(new TypingException(expr))
+  }
 }

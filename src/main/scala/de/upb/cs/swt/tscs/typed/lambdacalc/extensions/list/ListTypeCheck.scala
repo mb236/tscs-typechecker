@@ -6,7 +6,7 @@ import de.upb.cs.swt.tscs.typed._
 import scala.util.{Failure, Success, Try}
 
 trait ListTypeCheck extends Typecheck{
-  override def typecheck(): Try[_] = typecheck(this,scala.collection.mutable.HashMap())
+  override def typecheck(): Try[TypeInformation] = typecheck(this,scala.collection.mutable.HashMap())
   override def typecheck(expr: Expression, gamma: scala.collection.mutable.HashMap[Expression, TypeInformation]): Try[TypeInformation] = {
     // Just an optimization
     if (gamma.contains(expr)) return Success(gamma(expr))
@@ -29,7 +29,7 @@ trait ListTypeCheck extends Typecheck{
       => storeAndWrap(tail, ListTypeInformation(tail.typeInfo), gamma)
 
       case _
-      => Failure[TypeInformation](new TypingException(expr))
+      => super.typecheck(expr, gamma)
     }
     /*
     print(expr.toString + " --- ")
