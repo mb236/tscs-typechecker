@@ -16,11 +16,13 @@ trait Evaluation extends Expression{
 
   def isValue(expr: Expression) : Boolean = expr.isInstanceOf[Value]
 
-   def -->*(): Expression = {
-    var expr = -->(this)
+  def -->*() : Expression = -->*(this)
+
+  def -->*(input: Expression): Expression = {
+    var expr = -->(input)
 
     while (true) {
-      if (expr.isInstanceOf[Value]) return expr
+      if (isFinalResult(expr)) return expr
       if (expr == null) {
         println("Term is stuck")
         return null
@@ -28,5 +30,11 @@ trait Evaluation extends Expression{
       expr = -->(expr)
     }
     return null
+  }
+
+
+
+  def isFinalResult(expr: Expression) : Boolean = {
+    expr.isInstanceOf[Value]
   }
 }
