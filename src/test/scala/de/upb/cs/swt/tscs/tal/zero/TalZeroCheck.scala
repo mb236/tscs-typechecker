@@ -1,5 +1,6 @@
 package de.upb.cs.swt.tscs.tal.zero
 
+import de.upb.cs.swt.tscs.tal.Machine
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Success

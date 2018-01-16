@@ -1,5 +1,6 @@
 package de.upb.cs.swt.tscs.tal.zero
 
+import de.upb.cs.swt.tscs.tal.{Heap, HeapElement, Machine, RegisterFile}
 import de.upb.cs.swt.tscs.{Evaluation, Expression}
 
 /**
@@ -38,7 +39,7 @@ trait Semantics extends Evaluation{
       case true => null
       case false => program.labeledSequences.head.sequence
     }
-    val machine = new Machine(new Heap, new RegisterFile, firstSequence)
+    val machine = new Machine(new Heap[HeapElement], new RegisterFile, firstSequence)
     program.labeledSequences.foreach(ls => machine.H.put(ls.labelDeclaration.label, ls.sequence))
 
     machine
