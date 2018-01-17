@@ -34,13 +34,16 @@ trait Semantics extends Evaluation{
     * @return A first machine containing the program with initialed heap and register file
     */
   def bootstrapInitialMachine() : Machine = {
-    val program = this.asInstanceOf[Program]
-    val firstSequence = program.labeledSequences.isEmpty match {
+    val sequences = this match {
+      case de.upb.cs.swt.tscs.tal.zero.Program(s) => s
+      case de.upb.cs.swt.tscs.tal.one.Program(s) => s
+    }
+    val firstSequence = sequences.isEmpty match {
       case true => null
-      case false => program.labeledSequences.head.sequence
+      case false => sequences.head.sequence
     }
     val machine = new Machine(new Heap[HeapElement], new RegisterFile, firstSequence)
-    program.labeledSequences.foreach(ls => machine.H.put(ls.labelDeclaration.label, ls.sequence))
+    sequences.foreach(ls => machine.H.put(ls.labelDeclaration.label, ls.sequence))
 
     machine
   }

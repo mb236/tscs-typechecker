@@ -1,6 +1,6 @@
 package de.upb.cs.swt.tscs.tal.one
 
-import de.upb.cs.swt.tscs.tal.zero.{IntegerValue, Register}
+import de.upb.cs.swt.tscs.tal.zero.{IntegerValue, Register, TypedAssemblyLanguageAST}
 import org.parboiled2.{ParserInput, Rule1}
 
 /**
@@ -49,5 +49,9 @@ class Syntax(input : ParserInput) extends de.upb.cs.swt.tscs.tal.zero.Syntax(inp
     InstructionStackAlloc |
     InstructionStackFree |
     super.Instructions
+  }
+
+  override def Input: Rule1[TypedAssemblyLanguageAST] = rule {
+    super.Input ~> ((p : TypedAssemblyLanguageAST) => Program(p.asInstanceOf[de.upb.cs.swt.tscs.tal.zero.Program].labeledSequences))
   }
 }

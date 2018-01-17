@@ -1,8 +1,11 @@
 package de.upb.cs.swt.tscs.tal.one
 
 import de.upb.cs.swt.tscs.tal.Machine
-import de.upb.cs.swt.tscs.tal.zero.{LabelReference, Mov, Register, Sequence}
+import de.upb.cs.swt.tscs.tal.zero.{Mov, Register, Sequence}
 
+/**
+  * Implements the semantics of TAL-1
+  */
 trait Semantics extends de.upb.cs.swt.tscs.tal.zero.Semantics {
 
   private val StackPointer = Register(-1)
@@ -44,7 +47,7 @@ trait Semantics extends de.upb.cs.swt.tscs.tal.zero.Semantics {
             m.canResolveToLabelReference(memoryAccess.register) &&
             m.canResolveToHeapTuple(m.resolveLabelReference(memoryAccess.register))
         => {
-        val tuple = heap.get(m.resolveLabelReference(memoryAccess.register).label).asInstanceOf[HeapTuple]
+        val tuple = heap.get(m.resolveLabelReference(memoryAccess.register).label).get.asInstanceOf[HeapTuple]
         var offset = 0
         if (memoryAccess.n.isDefined) offset += memoryAccess.n.get.value
         registerFile.put(register.num, tuple(offset))
@@ -69,7 +72,7 @@ trait Semantics extends de.upb.cs.swt.tscs.tal.zero.Semantics {
           m.canResolveToLabelReference(memoryAccess.register) &&
           m.canResolveToHeapTuple(m.resolveLabelReference(memoryAccess.register))
       => {
-        val tuple = heap.get(m.resolveLabelReference(memoryAccess.register).label).asInstanceOf[HeapTuple]
+        val tuple = heap.get(m.resolveLabelReference(memoryAccess.register).label).get.asInstanceOf[HeapTuple]
         var offset = 0
         if (memoryAccess.n.isDefined) offset += memoryAccess.n.get.value
         tuple(offset) = m.resolveValue(register)

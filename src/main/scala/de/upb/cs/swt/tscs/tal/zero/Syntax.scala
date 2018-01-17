@@ -65,7 +65,7 @@ class Syntax(val input : ParserInput) extends Parser {
     DeclaredLabel ~ InstructionSequence ~> LabeledSequence
   }
 
-  def Input : Rule1[Program] = rule {
+  def Input : Rule1[TypedAssemblyLanguageAST] = rule {
     capture(zeroOrMore(LabeledInstructionSequence)) ~ EOI ~> ((s : Seq[LabeledSequence], t : String) => Program(s))
   }
 

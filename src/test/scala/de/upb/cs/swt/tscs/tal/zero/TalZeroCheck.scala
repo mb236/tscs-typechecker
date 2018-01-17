@@ -86,8 +86,8 @@ class TalZeroCheck extends FlatSpec with Matchers {
     val machine = parserResult.get.bootstrapInitialMachine()
 
     // provide some input values in registers
-    machine.R.put(1, new IntegerValue(3))
-    machine.R.put(2, new IntegerValue(2))
+    machine.R.put(1, new IntegerValue(12))
+    machine.R.put(2, new IntegerValue(15))
 
     // provide a jump point out of the program
     machine.R.put(4, new LabelReference("trampoline"))
@@ -97,7 +97,7 @@ class TalZeroCheck extends FlatSpec with Matchers {
     val finalMachine = parserResult.get.-->*(machine)
 
     // the result in register 3 should be 6
-    finalMachine.asInstanceOf[Machine].R.get(3).get.asInstanceOf[IntegerValue].value shouldBe 6
+    finalMachine.asInstanceOf[Machine].R.get(3).get.asInstanceOf[IntegerValue].value shouldBe 180
   }
 
 
