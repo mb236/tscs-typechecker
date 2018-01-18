@@ -71,7 +71,7 @@ class TalOneCheck extends FlatSpec with Matchers {
     // let it run
     val finalMachine = parserResult.get.-->*(machine).asInstanceOf[Machine]
 
-    // the result in register 3 should be 6
+    // the result should be stored on the heap in a label referred to from register 2
     finalMachine.canResolveToLabelReference(Register(2)) shouldBe true
     val labelReference = finalMachine.resolveLabelReference(Register(2))
     finalMachine.canResolveToHeapTuple(labelReference) shouldBe true
