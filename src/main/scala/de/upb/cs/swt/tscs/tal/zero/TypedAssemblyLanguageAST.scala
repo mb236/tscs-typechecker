@@ -30,11 +30,11 @@ trait TypedAssemblyLanguageAST extends Expression with Semantics with Typecheck 
           var current = seq.sequence
           while (current != null) {
             if (typecheck(current.instruction, gamma, psi).isFailure)
-              Failure
+              return new Failure[TypeInformation](null)
             current = current.sequence.orNull
           }
         }
-        Success(AsmTypes.Null)
+        return Success(AsmTypes.Null)
 
         // Idea: Typecheck labeled sequences in "jump-order".
         // If we jump from LS2 to LS1, we first need to typecheck LS2 so that
@@ -42,7 +42,7 @@ trait TypedAssemblyLanguageAST extends Expression with Semantics with Typecheck 
 
       case e: Jump =>
         if (typecheck(e.target, gamma, psi).get != AsmTypes.Label)
-          Failure
+          return new Failure[TypeInformation](null)
 
         val targetLabel = e.target.asInstanceOf[LabelReference].label
 
@@ -54,11 +54,11 @@ trait TypedAssemblyLanguageAST extends Expression with Semantics with Typecheck 
         var current = seq.sequence
         while (current != null) {
           if (typecheck(current.instruction, gamma, psi).isFailure)
-            Failure
+            return new Failure[TypeInformation](null)
           current = current.sequence.orNull
         }
 
-        Success(AsmTypes.Null)
+        return Success(AsmTypes.Null)
 
       //case e: ConditionalJump =>
         // TODO
@@ -76,7 +76,7 @@ trait TypedAssemblyLanguageAST extends Expression with Semantics with Typecheck 
 
           // destination doesn't have a type yet
           case _ => valueType match {
-            case Success(t) => storeAndWrap(e.destinationRegister, t, Gamma) // assign type to register, can't change later
+            case Success(t) => storeAndWrap(e.destinationRegister, t, gamma) // assign type to register, can't change later
             case _ => new Failure[TypeInformation](null)
           }
         }
@@ -91,7 +91,7 @@ trait TypedAssemblyLanguageAST extends Expression with Semantics with Typecheck 
             // source, destination and value must be of same type
             sourceType match {
               case Success(t2) if t2 == t => valueType match {
-                case Success(t3) if t3 == t => storeAndWrap(e, t, Psi)
+                case Success(t3) if t3 == t => storeAndWrap(e, t, psi)
                 case _ => new Failure[TypeInformation](null)
               }
               case _ => new Failure[TypeInformation](null)
@@ -110,13 +110,13 @@ trait TypedAssemblyLanguageAST extends Expression with Semantics with Typecheck 
 
       // S-INT, S-VAL
       case e: IntegerValue =>
-        storeAndWrap(e, AsmTypes.Int, Psi)
-        storeAndWrap(e, AsmTypes.Int, Gamma)
+        storeAndWrap(e, AsmTypes.Int, psi)
+        storeAndWrap(e, AsmTypes.Int, gamma)
 
       // S-LAB
       case e: LabelReference =>
-        storeAndWrap(e, AsmTypes.Label, Psi)
-        storeAndWrap(e, AsmTypes.Label, Gamma)
+        storeAndWrap(e, AsmTypes.Label, psi)
+        storeAndWrap(e, AsmTypes.Label, gamma)
 
       // S-REG
       case e: Register =>
