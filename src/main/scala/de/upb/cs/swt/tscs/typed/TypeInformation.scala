@@ -22,3 +22,9 @@ object TypeInformations {
   def Bool = new BaseTypeInformation("Bool")
   def AbstractBaseType = new BaseTypeInformation("A")
 }
+
+object AsmTypes {
+  def Int = new BaseTypeInformation("Int")
+  def Label = new BaseTypeInformation("Label")
+  def Null = new BaseTypeInformation("")
+}
